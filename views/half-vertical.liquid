@@ -1,31 +1,31 @@
-<div class="layout layout--col layout--top layout--stretch-x">
-  <div class="flex flex--row flex--wrap mb--2">
-    <span class="value--xsmall lg:value--small" data-pixel-perfect="true">TrueNAS Recommended</span>
+<div class="layout layout--col">
+  <div class="grid">
+    <span class="value--xsmall row row--center lg:value--base" data-pixel-perfect="true">TrueNAS Recommended Versions</span>
   </div>
 
-  <div class="flex flex-row flex-wrap">
-    <span class="value--xxsmall lg:value--xsmall text--gray-30 stretch-x" data-pixel-perfect="true">Profile</span>
-    <span class="value--xxsmall lg:value--xsmall text--gray-30 pl--3" data-pixel-perfect="true" style="min-width:100px;">Enterprise</span>
-    <span class="value--xxsmall lg:value--xsmall text--gray-30 pl--3" data-pixel-perfect="true" style="min-width:100px;">Community</span>
+  <div class="grid">
+    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true">Profile</div>
+    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true"">Enterprise</div>
+    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true"">Community</div>
   </div>
 
   <div class="divider"></div>
 
   {% for v in merge_variables.versions %}
-  <div class="flex flex-row flex-wrap">
-    <div class="value--xxsmall lg:value--xsmall stretch-x" data-pixel-perfect="true">{{ v.profile }}</div>
-    <div class="value--xxsmall lg:value--xsmall pl--3" data-pixel-perfect="true" style="min-width:100px;">{{ v.enterprise }}</div>
-    <div class="value--xxsmall lg:value--xsmall pl--3" data-pixel-perfect="true" style="min-width:100px;">{{ v.community }}</div>
+  <div class="grid">
+    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true">{{ v.profile }}</div>
+    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true"">{{ v.enterprise }}</div>
+    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true"">{{ v.community }}</div>
   </div>
   <div class="divider"></div>
 
   {% else %}
-  <div class="value--xxsmall p--12" data-pixel-perfect="true">No data</div>
+  <div class="value--xxsmall p--12" data-pixel-perfect="true">No version data available</div>
   {% endfor %}
 
-</div>
+  </div>
 
 <div class="title_bar">
-  <span class="title" data-pixel-perfect="true">TrueNAS Status</span>
+  <span class="title" data-pixel-perfect="true">TrueNAS RV</span>
   <span class="instance">{{ merge_variables.refreshed_at }}</span>
 </div>
