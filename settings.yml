@@ -1,0 +1,10 @@
+---
+strategy: polling
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://truenas-recommended-version.YOUR_SUBDOMAIN.workers.dev/
+polling_headers: ''
+polling_body: ''
+name: TrueNAS Recommended Versions
+refresh_interval: 1440

@@ -1,0 +1,17 @@
+# Wrangler
+.wrangler/
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX
+
+# Environment / secrets
+.env
+.env.*
+.dev.vars
+
+# Node
+node_modules/
