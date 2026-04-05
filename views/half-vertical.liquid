@@ -1,31 +1,29 @@
 <div class="layout layout--col">
-  <div class="grid">
-    <span class="value--xsmall row row--center lg:value--base" data-pixel-perfect="true">TrueNAS Recommended Versions</span>
-  </div>
-
-  <div class="grid">
-    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true">Profile</div>
-    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true"">Enterprise</div>
-    <div class="row row--center value--xxsmall lg:value--small text--gray-30" data-pixel-perfect="true"">Community</div>
-  </div>
-
-  <div class="divider"></div>
-
-  {% for v in merge_variables.versions %}
-  <div class="grid">
-    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true">{{ v.profile }}</div>
-    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true"">{{ v.enterprise }}</div>
-    <div class="row row--center value--xxsmall lg:value--base" data-pixel-perfect="true"">{{ v.community }}</div>
-  </div>
-  <div class="divider"></div>
-
-  {% else %}
-  <div class="value--xxsmall p--12" data-pixel-perfect="true">No version data available</div>
-  {% endfor %}
-
-  </div>
+  <span class="title row row--center mb--3" data-pixel-perfect="true">TrueNAS Recommended Versions</span>
+  <table class="table lg:table--large">
+    <thead>
+      <tr class="text--center">
+        <th><span class="value--xsmall lg:value--small lg:portrait:value--xsmall text--gray-30">Profile</span></th>
+        <th><span class="value--xsmall lg:value--small lg:portrait:value--xsmall text--gray-30">Enterprise</span></th>
+        <th><span class="value--xsmall lg:value--small lg:portrait:value--xsmall text--gray-30">Community</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in merge_variables.versions %}
+      <tr class="text--center">
+        <td><span class="value--xsmall lg:value--small lg:portrait:value--xsmall" data-pixel-perfect="true">{{ v.profile }}</span></td>
+        <td><span class="value--xsmall lg:value--small lg:portrait:value--xsmall" data-pixel-perfect="true">{{ v.enterprise }}</span></td>
+        <td><span class="value--xsmall lg:value--small lg:portrait:value--xsmall" data-pixel-perfect="true">{{ v.community }}</span></td>
+      </tr>
+      {% else %}
+      <td><span class="value--xsmall lg:value--base" data-pixel-perfect="true">{{ v.community }}</span></td>
+      <td><span class="value--xxsmall p--12" data-pixel-perfect="true">No version data available</span></td>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 <div class="title_bar">
   <span class="title" data-pixel-perfect="true">TrueNAS RV</span>
-  <span class="instance">{{ merge_variables.refreshed_at }}</span>
+  <span class="instance">Last refresh: {{ merge_variables.refreshed_at }}</span>
 </div>
