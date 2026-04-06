@@ -2,6 +2,7 @@ name: Update heartbeat.json
 
 permissions:
   contents: write
+  pull-requests: write
 
 on:
   schedule:
@@ -155,11 +156,23 @@ jobs:
           })();
           SCRIPT
 
-      - name: Commit & push (only if versions changed)
+      - name: Create PR (only if versions changed)
         if: env.VERSIONS_CHANGED != 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add heartbeat.json
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
+
+          BRANCH="heartbeat/update-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
           git commit -m "chore: update recommended versions"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: update recommended versions" \
+            --body "Automated heartbeat update — recommended versions have changed."
+
+          gh pr merge "$BRANCH" --squash --auto --delete-branch
