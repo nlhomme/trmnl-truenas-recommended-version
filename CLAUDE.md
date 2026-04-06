@@ -1,8 +1,13 @@
 # CLAUDE.md
 
+## Branching
+
+- `main` is production — only merge into it when changes are tested.
+- `dev` is for development and testing. Always test on `dev` first.
+
 ## Project structure
 
-- The **active deployment** uses root-level `worker.js` and `wrangler.toml`.
+- The **active deployment** uses a GitHub Actions workflow (`.github/workflows/heartbeat.yml`) that scrapes TrueNAS and commits results to `heartbeat.json`.
 - `settings.yml` is documentation only — it does NOT sync to the TRMNL dashboard.
 
 ## Liquid templates
@@ -14,18 +19,17 @@ All 4 templates in `views/` share the same logic and only differ in CSS sizing c
 - `views/half-vertical.liquid`
 - `views/quadrant.liquid`
 
-## Worker constraints (TRMNL integration)
+## Heartbeat constraints (TRMNL integration)
 
-- The worker response **must** be wrapped in `{ "merge_variables": { ... } }` for TRMNL to pick it up.
+- `heartbeat.json` **must** be wrapped in `{ "merge_variables": { ... } }` for TRMNL to pick it up.
 - Liquid templates access data via `{{ merge_variables.* }}`, never `{{ data.* }}`.
-- Always return HTTP 200 even on errors (non-200 causes TRMNL to discard data). Include error info in the response body.
-- All parsing and data transformation must be done **server-side** in `worker.js`. Liquid integer counters and comparisons are unreliable in TRMNL's Liquid engine.
+- All parsing and data transformation must be done in the GitHub Actions workflow. Liquid integer counters and comparisons are unreliable in TRMNL's Liquid engine.
 
 ## Data source
 
 - Versions are scraped from: [https://www.truenas.com/docs/softwarestatus/#which-truenas-version-is-recommended](https://www.truenas.com/docs/softwarestatus/#which-truenas-version-is-recommended)
 - The page contains an HTML table with columns: User Type, Enterprise, Community.
-- If the page structure changes, the `parseRecommendedVersions()` function in `worker.js` will need updating.
+- If the page structure changes, the `parseRecommendedVersions()` function in `.github/workflows/heartbeat.yml` will need updating.
 
 ## Documentation
 

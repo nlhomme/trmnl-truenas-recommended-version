@@ -1,0 +1,165 @@
+name: Update heartbeat.json
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
+
+concurrency:
+  group: heartbeat-json
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          ref: dev
+          persist-credentials: false
+
+      - name: Configure git credentials
+        run: |
+          git remote set-url origin \
+            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Scrape TrueNAS and build heartbeat
+        run: |
+          node - <<'SCRIPT'
+          const fs = require('fs');
+
+          const URL = 'https://www.truenas.com/docs/softwarestatus/';
+
+          async function parseRecommendedVersions(html) {
+            const anchor = html.indexOf('which-truenas-version-is-recommended');
+            if (anchor === -1) {
+              return [{ profile: 'Error', enterprise: 'Could not find recommended versions section', community: '' }];
+            }
+
+            const tableStart = html.indexOf('<table', anchor);
+            const tableEnd = html.indexOf('</table>', tableStart);
+            if (tableStart === -1 || tableEnd === -1) {
+              return [{ profile: 'Error', enterprise: 'Could not find versions table', community: '' }];
+            }
+
+            const tableHtml = html.slice(tableStart, tableEnd + '</table>'.length);
+
+            const rows = [];
+            const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+            let rowMatch;
+            while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+              const cells = [];
+              const cellRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+              let cellMatch;
+              while ((cellMatch = cellRegex.exec(rowMatch[1])) !== null) {
+                const text = cellMatch[1]
+                  .replace(/<[^>]+>/g, '')
+                  .replace(/&amp;/g, '&')
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>')
+                  .replace(/&quot;/g, '"')
+                  .replace(/&#39;/g, "'")
+                  .replace(/&nbsp;/g, ' ')
+                  .replace(/\s+/g, ' ')
+                  .trim();
+                cells.push(text);
+              }
+              if (cells.length > 0) {
+                rows.push(cells);
+              }
+            }
+
+            const versions = [];
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i];
+              versions.push({
+                profile: row[0] || '',
+                enterprise: row[1] || '',
+                community: row[2] || '',
+              });
+            }
+
+            return versions.length > 0
+              ? versions
+              : [{ profile: 'Error', enterprise: 'No version rows found', community: '' }];
+          }
+
+          (async () => {
+            let html;
+            try {
+              const res = await fetch(URL, {
+                headers: { 'User-Agent': 'TRMNL-TrueNAS-Plugin/1.0' },
+              });
+              if (!res.ok) {
+                console.error(`[heartbeat] TrueNAS page returned ${res.status}`);
+                process.exit(1);
+              }
+              html = await res.text();
+            } catch (err) {
+              console.error('[heartbeat] Failed to fetch TrueNAS page:', err.message);
+              process.exit(1);
+            }
+
+            const versions = await parseRecommendedVersions(html);
+
+            const heartbeat = {
+              merge_variables: {
+                versions,
+                refreshed_at: new Date().toLocaleString('en-US', {
+                  timeZone: 'UTC',
+                  day: 'numeric',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZoneName: 'short',
+                }),
+              },
+            };
+
+            // Only write if data actually changed
+            let existing = null;
+            try {
+              existing = fs.readFileSync('heartbeat.json', 'utf8');
+            } catch {}
+
+            const newContent = JSON.stringify(heartbeat);
+
+            // Compare versions only (ignore refreshed_at timestamp)
+            let changed = true;
+            if (existing) {
+              try {
+                const old = JSON.parse(existing);
+                changed = JSON.stringify(old.merge_variables.versions) !== JSON.stringify(heartbeat.merge_variables.versions);
+              } catch {}
+            }
+
+            if (changed) {
+              fs.writeFileSync('heartbeat.json', newContent);
+              console.log('[heartbeat] versions changed, heartbeat.json updated');
+              console.log(JSON.stringify(heartbeat, null, 2));
+            } else {
+              // Update timestamp even if versions unchanged, but flag no-change
+              fs.writeFileSync('heartbeat.json', newContent);
+              console.log('[heartbeat] versions unchanged, updating timestamp only');
+              // Set env var so commit step can skip
+              fs.appendFileSync(process.env.GITHUB_ENV, 'VERSIONS_CHANGED=false\n');
+            }
+          })();
+          SCRIPT
+
+      - name: Commit & push (only if versions changed)
+        if: env.VERSIONS_CHANGED != 'false'
+        run: |
+          git add heartbeat.json
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "chore: update recommended versions"
+          git pull --rebase origin dev
+          git push origin HEAD:dev
