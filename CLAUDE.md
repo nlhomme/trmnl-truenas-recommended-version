@@ -27,6 +27,10 @@ All 4 templates in `views/` share the same logic and only differ in CSS sizing c
 - The page contains an HTML table with columns: User Type, Enterprise, Community.
 - If the page structure changes, the `parseRecommendedVersions()` function in `worker.js` will need updating.
 
+## Documentation
+
+- `README.md` must be kept up to date whenever changes are made to the project (new features, structural changes, setup steps, etc.).
+
 ## TRMNL API docs
 
 TRMNL documentation is available at: [https://docs.trmnl.com/go/llms.txt](https://docs.trmnl.com/go/llms.txt)
