@@ -21,7 +21,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v5
         with:
-          ref: dev
+          ref: main
           persist-credentials: false
 
       - name: Configure git credentials
@@ -161,5 +161,5 @@ jobs:
           git add heartbeat.json
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
           git commit -m "chore: update recommended versions"
-          git pull --rebase origin dev
-          git push origin HEAD:dev
+          git pull --rebase origin main
+          git push origin HEAD:main
