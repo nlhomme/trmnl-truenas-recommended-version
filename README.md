@@ -6,7 +6,7 @@ It shows a table of recommended versions per user profile (Developer, Early Adop
 
 ## How it works
 
-A GitHub Actions workflow (`.github/workflows/heartbeat.yml`) runs every 12 hours, scrapes the TrueNAS documentation page, and writes the parsed data to `heartbeat.json`. A commit is only created when the recommended versions actually change, keeping the git history clean.
+A GitHub Actions workflow (`.github/workflows/heartbeat.yml`) runs every 12 hours, scrapes the TrueNAS documentation page, and writes the parsed data to `heartbeat.json`. When the recommended versions change, the workflow opens a PR to `main`, auto-merges it (squash), and deletes the temporary branch — keeping the git history clean.
 
 TRMNL polls the raw `heartbeat.json` file on GitHub and renders the data using Liquid templates.
 
@@ -39,7 +39,9 @@ views/
 
 2. Ensure GitHub Actions are enabled on the repository. The workflow runs automatically every 12 hours and can also be triggered manually from the **Actions** tab.
 
-3. The first run will populate `heartbeat.json` with real data. You can trigger it manually via **Actions > Update heartbeat.json > Run workflow**.
+3. Enable **Allow auto-merge** in **Settings > General > Pull Requests** and allow GitHub Actions to **create and approve pull requests** in **Settings > Actions > General**.
+
+4. The first run will populate `heartbeat.json` with real data. You can trigger it manually via **Actions > Update heartbeat.json > Run workflow**.
 
 ### Public polling URL
 
