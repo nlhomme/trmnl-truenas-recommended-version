@@ -36,7 +36,7 @@ jobs:
           node - <<'SCRIPT'
           const fs = require('fs');
 
-          const URL = 'https://www.truenas.com/docs/softwarestatus/';
+          const TRUENAS_URL = 'https://www.truenas.com/docs/softwarestatus/';
 
           async function parseRecommendedVersions(html) {
             const anchor = html.indexOf('which-truenas-version-is-recommended');
@@ -95,7 +95,7 @@ jobs:
           (async () => {
             let html;
             try {
-              const res = await fetch(URL, {
+              const res = await fetch(TRUENAS_URL, {
                 headers: { 'User-Agent': 'TRMNL-TrueNAS-Plugin/1.0' },
               });
               if (!res.ok) {
