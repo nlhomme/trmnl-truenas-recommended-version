@@ -175,4 +175,4 @@ jobs:
             --title "chore: update recommended versions" \
             --body "Automated heartbeat update — recommended versions have changed."
 
-          gh pr merge "$BRANCH" --squash --auto --delete-branch
+          gh pr merge "$BRANCH" --squash --delete-branch
