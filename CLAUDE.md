@@ -27,9 +27,9 @@ All 4 templates in `views/` share the same logic and only differ in CSS sizing c
 
 ## Data source
 
-- Versions are scraped from: [https://www.truenas.com/docs/softwarestatus/#which-truenas-version-is-recommended](https://www.truenas.com/docs/softwarestatus/#which-truenas-version-is-recommended)
-- The page contains an HTML table with columns: User Type, Enterprise, Community.
-- If the page structure changes, the `parseRecommendedVersions()` function in `.github/workflows/heartbeat.yml` will need updating.
+- Versions are retrieved from: [https://github.com/truenas/documentation/blob/master/data/software_status_config.yaml](https://github.com/truenas/documentation/blob/master/data/software_status_config.yaml) (via the raw GitHub URL).
+- The YAML contains a `table_data` map keyed by profile (`developer`, `early_adopter`, `general`, `mission_critical`), each with `enterprise.version` and `community.version` fields.
+- If the YAML schema changes, the `extractVersions()` function in `.github/workflows/heartbeat.yml` will need updating.
 
 ## Documentation
 

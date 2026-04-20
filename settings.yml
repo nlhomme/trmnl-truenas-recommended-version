@@ -3,7 +3,7 @@ strategy: polling
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: https://truenas-recommended-version.YOUR_SUBDOMAIN.workers.dev/
+polling_url: https://raw.githubusercontent.com/nlhomme/trmnl-truenas-recommended-version/main/heartbeat.json
 polling_headers: ''
 polling_body: ''
 name: TrueNAS Recommended Versions
