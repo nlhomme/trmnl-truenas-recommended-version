@@ -1,12 +1,12 @@
 # TRMNL — TrueNAS Recommended Versions
 
-A [TRMNL](https://usetrmnl.com/) plugin that displays the currently recommended TrueNAS versions, scraped from the official [TrueNAS Software Status](https://www.truenas.com/docs/softwarestatus/) page.
+A [TRMNL](https://usetrmnl.com/) plugin that displays the currently recommended TrueNAS versions, retrieved from the upstream [`software_status_config.yaml`](https://github.com/truenas/documentation/blob/master/data/software_status_config.yaml) in the official TrueNAS documentation repository (the same data shown on the [TrueNAS Software Status](https://www.truenas.com/docs/softwarestatus/) page).
 
 It shows a table of recommended versions per user profile (Developer, Early Adopter, General, Mission Critical) for both Enterprise and Community editions.
 
 ## How it works
 
-A GitHub Actions workflow (`.github/workflows/heartbeat.yml`) runs every 12 hours, scrapes the TrueNAS documentation page, and writes the parsed data to `heartbeat.json`. When the recommended versions change, the workflow opens a PR to `main`, auto-merges it (squash), and deletes the temporary branch — keeping the git history clean.
+A GitHub Actions workflow (`.github/workflows/heartbeat.yml`) runs every 12 hours, fetches the raw `software_status_config.yaml` from the TrueNAS documentation repo, and writes the parsed data to `heartbeat.json`. When the recommended versions change, the workflow opens a PR to `main`, auto-merges it (squash), and deletes the temporary branch — keeping the git history clean.
 
 TRMNL polls the raw `heartbeat.json` file on GitHub and renders the data using Liquid templates.
 
@@ -16,7 +16,7 @@ No external hosting (Cloudflare, AWS, etc.) is required — everything runs on G
 
 ```
 .github/workflows/
-  heartbeat.yml          — GitHub Actions workflow (scrape + commit)
+  heartbeat.yml          — GitHub Actions workflow (fetch YAML + commit)
 heartbeat.json           — Latest version data (auto-updated by workflow)
 settings.yml             — TRMNL plugin settings (documentation only, not synced)
 views/
